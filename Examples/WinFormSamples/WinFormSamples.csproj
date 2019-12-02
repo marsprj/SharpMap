@@ -73,11 +73,11 @@
       <HintPath>..\..\packages\Common.Logging.Log4Net207.3.4.1\lib\net40\Common.Logging.Log4Net207.dll</HintPath>
     </Reference>
     <Reference Include="gdalconst_csharp, Version=1.0.5387.28601, Culture=neutral, PublicKeyToken=db5a52b08dc5b321, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\GDAL.1.11.1\lib\net40\gdalconst_csharp.dll</HintPath>
+      <HintPath>..\..\packages\GDAL.2.3.2\lib\net40\gdalconst_csharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="gdal_csharp, Version=1.0.5387.28601, Culture=neutral, PublicKeyToken=db5a52b08dc5b321, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\GDAL.1.11.1\lib\net40\gdal_csharp.dll</HintPath>
+      <HintPath>..\..\packages\GDAL.2.3.2\lib\net40\gdal_csharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="GeoAPI, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
@@ -96,11 +96,11 @@
       <HintPath>..\..\packages\NetTopologySuite.CoordinateSystems.1.15.1\lib\net40-client\NetTopologySuite.CoordinateSystems.dll</HintPath>
     </Reference>
     <Reference Include="ogr_csharp, Version=1.0.5387.28600, Culture=neutral, PublicKeyToken=db5a52b08dc5b321, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\GDAL.1.11.1\lib\net40\ogr_csharp.dll</HintPath>
+      <HintPath>..\..\packages\GDAL.2.3.2\lib\net40\ogr_csharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="osr_csharp, Version=1.0.5387.28600, Culture=neutral, PublicKeyToken=db5a52b08dc5b321, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\GDAL.1.11.1\lib\net40\osr_csharp.dll</HintPath>
+      <HintPath>..\..\packages\GDAL.2.3.2\lib\net40\osr_csharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ProjNET, Version=1.4.0.0, Culture=neutral, PublicKeyToken=a1f5bdcd9c6f5740, processorArchitecture=MSIL">
@@ -595,10 +595,10 @@
     <PropertyGroup>
       <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Aktivieren Sie die Wiederherstellung von NuGet-Paketen, um die fehlende Datei herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\GDAL.Native.1.11.1\build\net40\GDAL.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GDAL.Native.1.11.1\build\net40\GDAL.Native.targets'))" />
+    <Error Condition="!Exists('..\..\packages\GDAL.Native.2.3.2\build\net40\GDAL.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\GDAL.Native.2.3.2\build\net40\GDAL.Native.targets'))" />
     <Error Condition="!Exists('..\..\packages\System.Data.SQLite.Core.1.0.109.1\build\net40\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\System.Data.SQLite.Core.1.0.109.1\build\net40\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <Import Project="..\..\packages\GDAL.Native.1.11.1\build\net40\GDAL.Native.targets" Condition="Exists('..\..\packages\GDAL.Native.1.11.1\build\net40\GDAL.Native.targets')" />
+  <Import Project="..\..\packages\GDAL.Native.2.3.2\build\net40\GDAL.Native.targets" Condition="Exists('..\..\packages\GDAL.Native.2.3.2\build\net40\GDAL.Native.targets')" />
   <Import Project="..\..\packages\System.Data.SQLite.Core.1.0.109.1\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\..\packages\System.Data.SQLite.Core.1.0.109.1\build\net40\System.Data.SQLite.Core.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

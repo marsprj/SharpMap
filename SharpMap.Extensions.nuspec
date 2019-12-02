@@ -22,7 +22,7 @@ The engine is written in C# and based on the .Net 4.0 framework.
     </frameworkAssemblies>
 	<dependencies>
 		<dependency id="SharpMap.Core" version="[$version$]"/>
-		<dependency id="GDAL" version="[1.11.1]" />
+		<dependency id="GDAL" version="[2.3.2]" />
 		<dependency id="Npgsql" version="[2.2.7]"/>
 		<dependency id="System.Data.SQLite.Core" version="[1.0.94.0]"/>
 	  <dependency id="NetTopologySuite.IO" version="[1.14.0.1]"/>
