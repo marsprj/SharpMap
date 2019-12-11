@@ -1182,7 +1182,6 @@ namespace SharpMap.Layers
                 finally
                 {
                     bitmap.UnlockBits(bitmapData);
-                    bitmap.Save(@"E:\temp\qqq.jpg");
                 }
 
                 // Update the histogram
