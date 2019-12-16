@@ -955,6 +955,12 @@ namespace SharpMap.Layers
                             }
                         }
 
+                        //####################################################################################
+                        // 修改 增加计算各个波段的最大最小值
+                        //####################################################################################
+                        double[] dMinMax = new double[2];
+                        ComputeRasterMinMax(dMinMax, ch, dataset);
+
                         // store these values to keep from having to make slow method calls
                         var bitmapTlx = bitmapTl.X;
                         var bitmapTly = bitmapTl.Y;
@@ -1060,7 +1066,27 @@ namespace SharpMap.Layers
                                         intermediateValue[i] *= scales[i];
 
                                         double spotVal;
-                                        var imageVal = spotVal = intermediateValue[i] = intermediateValue[i] * bitScales[i];
+                                        //####################################################################################
+                                        // 修改
+                                        //####################################################################################
+                                        //2019-12-16 00:12 SharpMap源码
+                                        //var imageVal = spotVal = intermediateValue[i] = intermediateValue[i] * bitScales[i];
+                                        //2019-12-16 00:12 修改SharpMap源码，增加Value2Byte函数，将像素值映射到byte空间
+                                        //                 SharpMap的策略是直接将65536映射到255(以Int16为例)
+                                        //                 Value2Byte函数：计算各波段的[min, max]，将该区间映射到[0,255]
+                                        var imageVal = 0.0;
+                                        if (Bands == 1)
+                                        {
+                                            imageVal = spotVal = intermediateValue[i] = intermediateValue[i] * bitScales[i];
+                                        }
+                                        else
+                                        {
+                                            var band = dataset.GetRasterBand(i + 1);
+                                            imageVal = spotVal = intermediateValue[i] = Value2Byte(intermediateValue[i], dMinMax[0], dMinMax[1], band.DataType);
+
+                                        }
+                                        //####################################################################################
+
 
                                         if (ch[i] == 4)
                                         {
@@ -1529,6 +1555,9 @@ namespace SharpMap.Layers
                 {
                     if (bitmapData != null)
                         bitmap.UnlockBits(bitmapData);
+
+                    //************************
+                    //输出数据看一下
                 }
             }
             if (TransparentColor != Color.Empty)
@@ -2121,5 +2150,65 @@ namespace SharpMap.Layers
         {
             return Math.Abs(val1 - val2) < double.Epsilon;
         }
+
+        #region Renyc
+        private byte Value2Byte(double pix, double dMin, double dMax, DataType dataType)
+        {
+            if(dataType== DataType.GDT_Byte)
+            {
+                return (byte)pix;
+            }
+
+            double vv = pix;
+            if (pix < dMin)
+            {
+                vv = dMin;
+            }
+            if(pix > dMax)
+            {
+                vv = dMax;
+            }
+
+            double span = dMax - dMin;
+            double dv = 255 * (vv - dMin) / span;
+            double bv = (dv + 0.5);
+            return (byte)bv;
+        }
+
+        private void ComputeRasterMinMax(double[] dMinMax, int[] ch, Dataset dataset)
+        {
+            dMinMax[0] = Double.MaxValue;
+            dMinMax[1] = Double.MinValue;
+
+            int length = ch.Length;
+            for(int i=0; i<length; i++)
+            {
+                if(ch[i]>=0)
+                {
+                    double[] mm = new double[2];
+
+                    Band band = dataset.GetRasterBand(i + 1);
+                    if (band != null)
+                    {
+                        band.ComputeRasterMinMax(mm, 0);
+                        if (mm[0] < dMinMax[0])
+                        {
+                            dMinMax[0] = mm[0];
+                        }
+
+                        if (mm[1] > dMinMax[1])
+                        {
+                            dMinMax[1] = mm[1];
+                        }
+                    }
+                }
+            }
+
+            //最大最小值向内缩2%
+            //double span = 2 * (dMinMax[1] - dMinMax[0]) / 100.0;
+            //dMinMax[0] += span;
+            //dMinMax[1] -= span;
+        }
+        #endregion
     }
 }
