@@ -1092,7 +1092,11 @@ namespace SharpMap.Layers
                                         {
                                             if (!DoublesAreEqual(imageVal,noDataValues[i]))
                                             {
-                                                var color = colorBlend.GetColor(Convert.ToSingle(imageVal));
+                                                //注释：注释SharpMap的下面一行源代码。 2019-12-16 14:41
+                                                //原因：对于Uint16/32类型来说，在1080行由intermediateValue生成imageVal时候，乘了bitSaclesUI因子。但在colorBlend.GetColor函数中计算Color的时候，MinMax又使用未乘bitSacles的值
+                                                //var color = colorBlend.GetColor(Convert.ToSingle(imageVal));
+                                                //添加：针对上述原因，令imageVal再除以bitScale，恢复到原始值
+                                                var color = colorBlend.GetColor(Convert.ToSingle(imageVal / bitScales[i]));
                                                 intermediateValue[0] = color.B;
                                                 intermediateValue[1] = color.G;
                                                 intermediateValue[2] = color.R;
@@ -1178,6 +1182,7 @@ namespace SharpMap.Layers
                 finally
                 {
                     bitmap.UnlockBits(bitmapData);
+                    bitmap.Save(@"E:\temp\qqq.jpg");
                 }
 
                 // Update the histogram
