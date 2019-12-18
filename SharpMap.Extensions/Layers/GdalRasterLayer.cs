@@ -791,7 +791,13 @@ namespace SharpMap.Layers
             var bitmapTl = new Point();
             var bitmapSize = new Size();
 
-            const int pixelSize = 3; //Format24bppRgb = byte[b,g,r] 
+            //####################################################################################
+            // 修改 Image模式由RGB修改为ARGB
+            //####################################################################################
+            //原始代码：2019-12-18 
+            //const int pixelSize = 3; //Format24bppRgb = byte[b,g,r] 
+            //修改代码：2019-12-18 Format24bppRgb-->Format32bppArgb
+            const int pixelSize = 4; //Format32bppArgb = byte[b,g,r,a] 
 
             if (dataset != null)
             {
@@ -851,7 +857,7 @@ namespace SharpMap.Layers
 
                 //initialize bitmap
                 BitmapData bitmapData;
-                bitmap = InitializeBitmap(bitmapSize, PixelFormat.Format24bppRgb, out bitmapData);
+                bitmap = InitializeBitmap(bitmapSize, PixelFormat.Format32bppArgb, out bitmapData);
                 
                 try
                 {
@@ -860,6 +866,7 @@ namespace SharpMap.Layers
                         var cr = _noDataInitColor.R;
                         var cg = _noDataInitColor.G;
                         var cb = _noDataInitColor.B;
+                        var ca = _noDataInitColor.A;
 
 
                         // create 3 dimensional buffer [band][x pixel][y pixel]
@@ -919,7 +926,7 @@ namespace SharpMap.Layers
                                         {
                                             ch[i] = 4;
                                             colorBlend = GetColorBlend(band);
-                                            intermediateValue = new Double[3];
+                                            intermediateValue = new Double[4];
                                         }
                                         break;
                                     case ColorInterp.GCI_GrayIndex:
@@ -939,14 +946,18 @@ namespace SharpMap.Layers
                                         {
                                             using (var colEntry = colorTable.GetColorEntry(col))
                                             {
+                                                //修改：2019-12-18 增加colEntry.c4，支持alpha通道
                                                 colorTableCache[col] = new short[]{
-                                                    colEntry.c1, colEntry.c2, colEntry.c3
+                                                    colEntry.c1,    //r
+                                                    colEntry.c2,    //g
+                                                    colEntry.c3,    //b
+                                                    colEntry.c4     //a
                                                 };
                                             }
                                         }
 
                                         ch[i] = 5;
-                                        intermediateValue = new Double[3];
+                                        intermediateValue = new Double[4];
                                         break;
                                     default:
                                         ch[i] = -1;
@@ -1100,6 +1111,7 @@ namespace SharpMap.Layers
                                                 intermediateValue[0] = color.B;
                                                 intermediateValue[1] = color.G;
                                                 intermediateValue[2] = color.R;
+                                                intermediateValue[3] = color.A;
                                                 //intVal[3] = ce.c4;
                                             }
                                             else
@@ -1107,6 +1119,7 @@ namespace SharpMap.Layers
                                                 intermediateValue[0] = cb;
                                                 intermediateValue[1] = cg;
                                                 intermediateValue[2] = cr;
+                                                intermediateValue[2] = 0;// ca;透明
                                             }
                                         }
 
@@ -1116,15 +1129,21 @@ namespace SharpMap.Layers
                                             {
                                                 var ce = colorTableCache[Convert.ToInt32(imageVal)];
 
+                                                //intermediateValue[0] = ce[2];
+                                                //intermediateValue[1] = ce[1];
+                                                //intermediateValue[2] = ce[0];
                                                 intermediateValue[0] = ce[2];
                                                 intermediateValue[1] = ce[1];
                                                 intermediateValue[2] = ce[0];
+                                                intermediateValue[3] = ce[3];
+
                                             }
                                             else
-                                            {
+                                            {   //NoData
                                                 intermediateValue[0] = cb;
                                                 intermediateValue[1] = cg;
                                                 intermediateValue[2] = cr;
+                                                intermediateValue[3] = 0;// ca;
                                             }
                                         }
 
@@ -1641,9 +1660,15 @@ namespace SharpMap.Layers
                 }
                 else
                 {
-                    row[offsetX++] = (byte)intVal[0];
-                    row[offsetX++] = (byte)intVal[1];
-                    row[offsetX] = (byte)intVal[2];
+                    row[offsetX++] = (byte)intVal[0];       //b
+                    row[offsetX++] = (byte)intVal[1];       //g
+                    row[offsetX++] = (byte)intVal[2];       //r
+                    row[offsetX]   = (byte)intVal[3];       //a
+                    //row[offsetX++] = (byte)0;   //b
+                    //row[offsetX++] = (byte)255;   //g
+                    //row[offsetX++] = (byte)0;   //r
+                    //row[offsetX] = (byte)255;   //a
+
                 }
             }
             // IR grayscale
