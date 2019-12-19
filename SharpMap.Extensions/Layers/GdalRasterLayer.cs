@@ -890,6 +890,22 @@ namespace SharpMap.Layers
 
                         ColorBlend colorBlend = null;
                         var intermediateValue = new double[Bands];
+                        /*********************************************************************/
+                        /* 增加代码 当RGB图时候，需要多增加一个 intermediateValue作为Alpha波段   */
+                        /*********************************************************************/
+
+                        if(Bands==3)
+                        {
+                            var band = dataset.GetRasterBand(1);
+                            ColorInterp ci = band.GetRasterColorInterpretation();
+                            if(ci== ColorInterp.GCI_BlueBand|| ci == ColorInterp.GCI_GreenBand||ci==ColorInterp.GCI_RedBand)
+                            {
+                                intermediateValue = new double[4];
+                                intermediateValue[3] = 255; //Alpha波段，不透明；
+                                ch = new int[4];
+                                ch[3] = -2;
+                            }
+                        }
 
                         // get data from image
                         for (var i = 0; i < Bands; i++)
@@ -905,8 +921,8 @@ namespace SharpMap.Layers
                                 //Get the scale value if present
                                 band.GetScale(out scales[i], out hasVal);
                                 if (hasVal == 0) scales[i] = 1.0;
+                                
 
-                                //
                                 bitScales[i] = GetBitScale(band.DataType);
                                 switch (band.GetRasterColorInterpretation())
                                 {
@@ -1119,7 +1135,7 @@ namespace SharpMap.Layers
                                                 intermediateValue[0] = cb;
                                                 intermediateValue[1] = cg;
                                                 intermediateValue[2] = cr;
-                                                intermediateValue[2] = 0;// ca;透明
+                                                intermediateValue[3] = 0;// ca;透明
                                             }
                                         }
 
@@ -1155,6 +1171,20 @@ namespace SharpMap.Layers
                                                                                             gndX,
                                                                                             gndY);
 
+                                                /**********************************************************************/
+                                                /* 增加代码：Band==3的时候，在绘制的时候增加第4波段作为Alpha，支持Nodata的透明
+                                                /**********************************************************************/
+                                                //增加代码 2019-12-19
+                                                if (double.IsNaN(noDataValues[i]) || !DoublesAreEqual(imageVal, noDataValues[i]))
+
+                                                {
+                                                    intermediateValue[3] = 255;     //像素值不等于NoData，则不透明
+                                                }
+                                                else
+                                                {
+                                                    intermediateValue[3] = 0;     //像素值等于NoData，则全透明
+                                                }
+
                                                 // if pixel is within ground boundary, add its value to the histogram
                                                 if (ch[i] != -1 && intermediateValue[i] > 0 &&
                                                     (HistoBounds.Bottom >= (int) gndY) &&
@@ -1177,6 +1207,7 @@ namespace SharpMap.Layers
                                             (intermediateValue[2]*0.2126 + intermediateValue[1]*0.7152 +
                                              intermediateValue[0]*0.0722)]
                                             ++;
+
 
                                     DateTime writeStart = DateTime.MinValue;
                                     if (_logger.IsDebugEnabled)
@@ -1201,6 +1232,7 @@ namespace SharpMap.Layers
                 finally
                 {
                     bitmap.UnlockBits(bitmapData);
+                    bitmap.Save(@"E:\temp\sss.png");
                 }
 
                 // Update the histogram
@@ -1742,10 +1774,29 @@ namespace SharpMap.Layers
                         intVal[1] = intVal[2] = 0;
                 }
 
-                for (int i = 0; i < 3; i++)
+                //for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (ch[i] != 3 && ch[i] != -1)
-                        row[(int)Math.Round(x) * iPixelSize + ch[i]] = (byte)intVal[i];
+                    {
+                        // SharpMap原始代码
+                        // row[(int)Math.Round(x) * iPixelSize + ch[i]] = (byte)intVal[i];
+                        // 修改代码 2019-12-19 15:44 Begin
+                        if (ch[i]>=0)
+                        {
+                            //RGB波段
+                            row[(int)Math.Round(x) * iPixelSize + ch[i]] = (byte)intVal[i];
+                        }
+                        else
+                        {
+                            //Alpha波段
+                            row[(int)Math.Round(x) * iPixelSize + 3] = (byte)intVal[i];
+                        }
+                        // 修改代码 2019-12-19 15:44 End
+
+
+                    }
+
                 }
             }
         }
