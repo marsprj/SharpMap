@@ -631,6 +631,7 @@ namespace SharpMap.Layers
             CoordinateTransformation = ctFac.CreateFromCoordinateSystems(srcCoord, tgtCoord);
             ReverseCoordinateTransformation = ctFac.CreateFromCoordinateSystems(tgtCoord, srcCoord);
         }
+
         // get boundary of raster
         private Envelope GetExtent()
         {

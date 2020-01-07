@@ -164,7 +164,7 @@ namespace SharpMap.Utilities.SpatialIndexing
         public int maxdepth;
 
         /// <summary>
-        /// Minimum Error metric – the volume of a box + a unit cube.
+        /// Minimum Error metric ?the volume of a box + a unit cube.
         /// The unit cube in the metric prevents big boxes that happen to be flat having a zero result and muddling things up.
         /// </summary>
         public int minerror;

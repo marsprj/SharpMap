@@ -177,14 +177,14 @@ namespace SharpMap.Rendering
             {
                 Logger.Error(e.Message, e);
 
-                using (var pen = new Pen(Color.Red, 4f))
-                {
-                    var size = mapViewport.Size;
+                //using (var pen = new Pen(Color.Red, 4f))
+                //{
+                //    var size = mapViewport.Size;
 
-                    g.DrawLine(pen, 0, 0, size.Width, size.Height);
-                    g.DrawLine(pen, size.Width,0, 0, size.Height);
-                    g.DrawRectangle(pen, 0, 0, size.Width, size.Height);
-                }
+                //    g.DrawLine(pen, 0, 0, size.Width, size.Height);
+                //    g.DrawLine(pen, size.Width,0, 0, size.Height);
+                //    g.DrawRectangle(pen, 0, 0, size.Width, size.Height);
+                //}
                 
             }
         }
